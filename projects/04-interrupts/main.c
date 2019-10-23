@@ -69,7 +69,7 @@ ISR(TIMER0_OVF_vect)
 /**
  *  Brief: Timer/Counter1 overflow interrupt routine. Toggle red LED.
  */
-ISR(TIMER1_OVF_vect)
+ISR(PCINT)
 {
     GPIO_toggle (&PORTB, LED_BLUE);
 }
