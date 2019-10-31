@@ -21,11 +21,14 @@
 #include <stdlib.h>             // itoa() function
 #include "timer.h"
 #include "lcd.h"
+#include <string.h>
 
 uint8_t temp10;
+uint8_t vyber;
 char desitkova [4];
 char sestnactkova[3];
 char dvojkova[9];
+char delka[2];
 char lcd_user_symbols[16] = {
   0x0C,
   0x0D,
@@ -52,15 +55,69 @@ void bargr(uint8_t value)
     {
         for(uint8_t i = 1; i <= 16; i++)    
         {
+            lcd_gotoxy(i - 1,0);
             lcd_gotoxy(i - 1,1);
             
         
         if(value >= ((255*i)/16)-1)
         {
-        lcd_putc(0xFF);
+        lcd_putc(0x00);
         }
+        }
+        if(value ==0)
+        {
+            
+            lcd_gotoxy(0,1);
+            lcd_puts("                ");
+            lcd_gotoxy(10,0);
+            lcd_puts("   ");
+            
+        }
+        if (value == 255){
+            vyber = 1;
+            lcd_gotoxy(0,1);
+            lcd_puts("                ");
+            lcd_gotoxy(0,0);
+            lcd_puts("Counter:");
+            lcd_gotoxy(6,1);
+            lcd_puts("0b");
+            lcd_gotoxy(1,1);
+            lcd_puts("0x");
         }
     }
+void pocitani()
+{
+    lcd_gotoxy(3,1);
+    lcd_puts(sestnactkova);
+    int size = strlen(dvojkova);
+
+    /*itoa(size, delka, 10);                ---------    zobrazeni delky aktualniho cisla v bin soustave v pravem hornim rohu
+    lcd_gotoxy(15, 0);
+    lcd_puts(delka);
+    */
+    
+    lcd_gotoxy(16-size,1);
+    lcd_puts(dvojkova);
+    lcd_gotoxy(10,0);
+    lcd_puts(desitkova);
+    if(temp10 ==0)
+        {
+            
+            lcd_gotoxy(10,0);
+            lcd_puts("   ");
+            lcd_gotoxy(8,1);
+            lcd_puts("00000000");
+            lcd_gotoxy(3,1);
+            lcd_puts("  ");
+            
+        }
+    if (temp10 == 255){
+            vyber = 0;
+            lcd_clrscr();
+            lcd_gotoxy(8,0);
+            lcd_putc(0x00);
+        }
+}
 /* Functions ---------------------------------------------------------*/
 /**
  *  Brief:  Main program. Shows decimal values ​​on LCD display.
@@ -90,21 +147,19 @@ int main(void)
     
     // Clear display and set cursor to home position
     lcd_clrscr();
-
+    vyber = 0;
     // Display first user - defined character
-    lcd_gotoxy(0,1);
+    lcd_gotoxy(15,0);
     lcd_putc(0x00);
-    lcd_gotoxy(1,1);
-    lcd_putc(0x01);
+
     // Display string without auto linefeed
 
    
-    lcd_gotoxy(0,0);
-    lcd_puts("Counter:");
-    lcd_gotoxy(3,1);
-    lcd_putc('$');
-    lcd_gotoxy(6,1);
-    lcd_puts("0b");
+    
+
+    /*lcd_gotoxy(8,1);
+    lcd_puts("00000000");
+    */
     // TODO: Display variable value in decimal, binary, and hexadecimal
     //----------------------------------------------------------------------------------------------------
     
@@ -116,7 +171,7 @@ int main(void)
     /* Timer1
      * TODO: Configure Timer1 clock source and enable overflow 
      *       interrupt */
-    TIM_config_prescaler(TIM1, TIM_PRESC_64);
+    TIM_config_prescaler(TIM1, TIM_PRESC_8);
     TIM_config_interrupt(TIM1, TIM_OVERFLOW_ENABLE);
     /* TODO: Design at least two user characters and store them in 
      *       the display memory */
@@ -143,14 +198,14 @@ ISR(TIMER1_OVF_vect)
     itoa(temp10, sestnactkova, 16);
     itoa(temp10, dvojkova, 2);
 
-    lcd_gotoxy(10,0);
-    lcd_puts(desitkova);
     
+    
+    if(vyber == 0) {
     bargr(temp10);
-    /*lcd_gotoxy(4,1);
-    lcd_puts(sestnactkova);
-    lcd_gotoxy(8,1);
-    lcd_puts(dvojkova);
-      */  
+    }
+    else 
+    {
+    pocitani();  
+    }
    
 }
