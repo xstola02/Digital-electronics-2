@@ -29,6 +29,7 @@
 ;* Return: r24 - New value of shift register
 .global rand4_asm
 rand4_asm:
+    
     push result             ; Save "Result" on Stack
     push temp               ; Save "Temp" on Stack
 
