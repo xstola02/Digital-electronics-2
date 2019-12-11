@@ -35,14 +35,29 @@
 /* Functions ---------------------------------------------------------*/
 
 
-int calc_alt(double pressure, double press_ref) //Function for calc altitude from BME pressure
+/*double calc_alt(double pressure, double press_ref, double temperature) //Function for calc altitude from BME pressure
 {
-    double cit = log10(pressure/press_ref) * press_ref;
-    double jmen = log10(2.718281) * 1.225 * 9.98;
-    double alt = -cit / jmen;
+    press_ref *= 100;
+    pressure *= 100;
+    double alt = (press_ref*(16000+64*temperature)+pressure*(16000+64*temperature))/(pressure + press_ref);
+    double jmen = ;
+    double alt = cit / jmen;
+    
+    char cit_ch[10];           
+    char jmen_ch[10]; 
+    itoa(cit, cit_ch, 10);     
+    itoa(jmen, jmen_ch, 10);
+    nokia_lcd_clear();
+    nokia_lcd_set_cursor(0, 30);
+    nokia_lcd_write_string("Dif:", 1);
+    nokia_lcd_write_string(cit_ch,1);
+    nokia_lcd_set_cursor(0, 40);
+    nokia_lcd_write_string("Tem:", 1);
+    nokia_lcd_write_string(jmen_ch,1);
+    nokia_lcd_render();
     return alt;
-}
-void display_values(int pressure, int altitude_b, int altitude_gps, int temperature) //Function fordisplay values 
+}*/
+void display_values(int pressure, int altitude_b, int altitude_gps, double temperature) //Function fordisplay values 
  {
     int altitude_dif = altitude_gps - altitude_b;
 
@@ -67,15 +82,15 @@ void display_values(int pressure, int altitude_b, int altitude_gps, int temperat
     nokia_lcd_set_cursor(0, 20);
     nokia_lcd_write_string("Alt GPS:", 1);
     nokia_lcd_write_string(altitude_gps_ch,1);
-    nokia_lcd_set_cursor(0, 30);
+ /*   nokia_lcd_set_cursor(0, 30);
     nokia_lcd_write_string("Difference:", 1);
     nokia_lcd_write_string(altitude_dif_ch,1);
     nokia_lcd_set_cursor(0, 40);
     nokia_lcd_write_string("Temperature:", 1);
-    nokia_lcd_write_string(temperature_ch,1);
+    nokia_lcd_write_string(temperature_ch,1);*/
     nokia_lcd_render();
  }
- 
+
 /*
 *               function we are not using in our project, 
 *               but when we tried to make the project work from the beginning,
@@ -129,11 +144,13 @@ ISR(TIMER1_OVF_vect)
     double press_ref = 1013;        //Select pressure reference - we want to add a function which will display a choice of pressure reference
 	bmp280_measure();               // Request for download actual data from BME registers
 	double	pressure = (bmp280_getpressure()/100+32);
-    double altitude_b = calc_alt(pressure, press_ref);
+    double temperature = bmp280_gettemperature()/100;
+    double altitude_b = (press_ref*(16000+64*temperature)+pressure*(16000+64*temperature))/(pressure + press_ref);
     int altitude_gps = 225;
-    int temperature = bmp280_gettemperature()/100;
 
-    display_values(pressure, altitude_b, altitude_gps, temperature);
+
+    
+    //display_values(pressure, altitude_b, altitude_gps, temperature);
 
   
 }
