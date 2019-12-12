@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <stdio.h>         // itoa() function
 #include <avr/io.h>
+#include <string.h>
+#include <util/delay.h>
 #include <math.h>
 #include <avr/interrupt.h>
 #include "timer.h"
@@ -21,14 +23,20 @@
 #include "twi.h"
 #include "nokia5110.h"
 #include "bmp280.h"
+#include "GPIO.h"
 
 
 /* Define ------------------------------------------------------------*/
 #define UART_BAUD_RATE 9600
 #define BMP_adress 0b01110110
-#define UART_BUFLEN 10
+//#define UART_BUFLEN 100
 /* Variables ---------------------------------------------------------*/
-char gps[70];
+char gps[100];
+//char* gps_1[70];
+char *gps_2[10];
+double alti_gps;
+char alti[10];
+char* id;
 /* Function prototypes -----------------------------------------------*/
 
 
@@ -48,7 +56,7 @@ void display_values(int pressure, int altitude_b, int altitude_gps, double tempe
 
     itoa(pressure, pressure_ch, 10);           // conversion from int data to string   
     itoa(altitude_b/100, altitude_b_ch, 10);
-    itoa(altitude_gps/100, altitude_gps_ch, 10);
+    itoa(altitude_gps, altitude_gps_ch, 10);
     itoa(altitude_dif/100, altitude_dif_ch, 10);
     itoa(temperature, temperature_ch, 10);
     
@@ -75,23 +83,6 @@ void display_values(int pressure, int altitude_b, int altitude_gps, double tempe
     nokia_lcd_render();
  }
 
-/*
-*               function we are not using in our project, 
-*               but when we tried to make the project work from the beginning,
-*               it wasnt working properly without this particular function 
-*               now the project is working as it should without this function, but just in case we left it here
-void uart_print(char *name, long val)   
-{
-	char debug_buffer[UART_BUFLEN];
-
-        uart_puts(name);
-        uart_puts(" = ");
-
-        ltoa((val), debug_buffer, UART_BUFLEN);
-        uart_puts(debug_buffer);
-        uart_puts("\n");
-}*/
-
 int main(void)
 {
     // UART: asynchronous, 8-bit data, no parity, 1-bit stop
@@ -100,30 +91,61 @@ int main(void)
     // Initialisation BME 280
     bmp280_init();
     //uart_puts("ok");
-    
     // Timer1
-    TIM_config_prescaler(TIM1, TIM_PRESC_256);
+    TIM_config_prescaler(TIM1, TIM_PRESC_1024);
     TIM_config_interrupt(TIM1, TIM_OVERFLOW_ENABLE);
 
     // Display init
     nokia_lcd_init();
     nokia_lcd_clear();
+    nokia_lcd_set_cursor(10,0);             // Displayed logo for 2s
+    nokia_lcd_write_string("ALTI", 3);
+    nokia_lcd_set_cursor(2,25);
+    nokia_lcd_write_string("meter", 3);
+    nokia_lcd_render();
+    _delay_ms(2000);
+
+    nokia_lcd_clear();
+    nokia_lcd_write_string("Pres: ",1);
+    nokia_lcd_set_cursor(0, 10);
+    nokia_lcd_write_string("BMP: ", 1);
+    nokia_lcd_set_cursor(0, 20);
+    nokia_lcd_write_string("GPS: ", 1);
+    nokia_lcd_set_cursor(0, 30);
+    nokia_lcd_write_string("Diff: ", 1);
+    nokia_lcd_set_cursor(0, 40);
+    nokia_lcd_write_string("Temp: ", 1);
+    nokia_lcd_render();
+
     // Enables interrupts by setting the global interrupt mask
     sei();
 
     // Infinite loop
     for (;;) {
-        
-  /*          for(uint8_t i = 0; i < 68; i++)
+        while (!(UCSR0A & (1<<RXC0)))       // Recomended code from datasheet (Atmega 328P) - If there are unread data in the buffer, a condition occurs
+        {
+            if(uart_getc() == '$')          // If first char is '$' (ID char for PA6H message)
             {
-                gps[i] = uart_getc();
+                for(uint8_t i = 0; i < 99; i++)     // Print message from Buffer to string gps
+                {
+                    gps[i] = uart_getc();
+                }
+                gps[99] = '\0';             // Print "\0" to end of message
             }
-        
-        nokia_lcd_clear();
-        nokia_lcd_set_cursor(0,0);
-        nokia_lcd_write_string(gps, 1);
-        nokia_lcd_render();
-  */   }
+            
+            if (strstr(gps,"GPGGA") != NULL)    // Search key "GPGGA" in received message
+            {
+                char* gps_1 = gps;
+                int u = 0;
+                while((id = strtok_r(gps_1,",",&gps_1)))    //Divides string into several strings, when he reads ","
+                {
+                    gps_2[u] = id; 
+                    u++; 
+                }
+                alti_gps = atof(gps_2[9]);                    //Choses the only string we need from the bunch and assigns it to variable alti_gps
+            }
+        }
+    }
 
     // Will never reach this
     return (0);
@@ -134,17 +156,13 @@ int main(void)
  
 ISR(TIMER1_OVF_vect)
 {
-    
-    double press_ref = 1020;        //Select pressure reference - we want to add a function which will display a choice of pressure reference
+    double press_ref = 1026;        //Select pressure reference - we want to add a function which will display a choice of pressure reference
 	bmp280_measure();               // Request for download actual data from BME registers
 	double pressure = (bmp280_getpressure()/100+32);
-    double temperature = 1 ;//bmp280_gettemperature()/100;
-    uint64_t altitude_b = ((press_ref*100*(16000+(64*temperature))+pressure*100*(16000+(64*temperature)))/(100*(press_ref - pressure)));
-    int altitude_gps = 28900;
-
-
+    double temperature = bmp280_gettemperature()/100;                 //for testing we chose temperature -1degrese for accurate temperature outside 
+    uint64_t altitude_b = abs(((press_ref*100*(16000+(64*temperature))+pressure*100*(16000+(64*temperature)))/(100*(press_ref - pressure))));
+                                        // equation for restatement pressure to altitude with temperature compansation
     
-    display_values(pressure, altitude_b, altitude_gps, temperature);
+    display_values(pressure, altitude_b, alti_gps, temperature);
 
-  
 }
