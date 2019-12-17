@@ -79,9 +79,9 @@ and to get the real accurate pressure value, the data had to be corigated by ari
 - the particular data are separated by the symbol *"**,**"*
 - the output parameter = altitude is singled into a new parameter, then rendered into double and displayed on Nokia5110 display
 
+## Schema
 
-
-
+<img src="https://github.com/xstola02/Digital-electronics-2/blob/master/projects/Project-Altitude/schema.jpg">
 
 
 
