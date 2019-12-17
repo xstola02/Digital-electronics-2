@@ -33,7 +33,7 @@ Using present pressure data from BMP280 sensor to calculate the accurated altitu
 
 ## Software
 
-- Visual studio 
+- Visual Studio Code 
 - PuTTy
 - Fritzing
 
