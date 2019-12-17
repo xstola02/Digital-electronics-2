@@ -70,12 +70,12 @@ and to get the real accurate pressure value, the data had to be corigated by ari
 - we got working the temperature&pressure data and tried several equations to calculate the altitude
 - we worked up the topic of pressure reference and used an equation, which includes temperature compensation, because the pressure and temperature are dependent on each other
 - we tried to work out the GPS module, but we failed
-- firstly we wanted to receive the data based on interrupt vector from the UART unit( RX XXX)
+- firstly we wanted to receive the data based on interrupt vector from the UART unit(USART_RX_vect)
 - We ended up using recomendation from datasheet and with a little help from the teacher we wrote an algorithm which tests flag bit RXC0A set in the UCSR0A register
 - the flag bit shows unread data from UART buffer
 - if there are data present, we check the first bit for the $ sign, if it is present the rest of the data is written in a defined field
-- then the funkcion strstr ( ) goes though this field and searches for for string "GPPGA" which contains desired data
-- if the GPPGA string is found, then the fille field is rearanged into a new field, where thanks to function strtok we divide the field into seperate lines
+- then the funkcion strstr ( ) goes though this field and searches for for string "GPGGA" which contains desired data
+- if the GPGGA string is found, then the fille field is rearanged into a new field, where thanks to function strtok we divide the field into seperate lines
 - the particular data are separated by the symbol *"**,**"*
 - the output parameter = altitude is singled into a new parameter, then rendered into double and displayed on Nokia5110 display
 
