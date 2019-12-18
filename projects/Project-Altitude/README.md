@@ -83,7 +83,8 @@ and to get the real accurate pressure value, the data had to be corigated by ari
 
 <img src="https://github.com/xstola02/Digital-electronics-2/blob/master/projects/Project-Altitude/schema.jpg">
 
-
+## Video
+[online](https://youtu.be/bJNSbAfLO3k)
 
 
 ## References
