@@ -157,8 +157,8 @@ int main(void)
 ISR(TIMER1_OVF_vect)
 {
     double press_ref = 1026;        //Select pressure reference - we want to add a function which will display a choice of pressure reference
-	bmp280_measure();               // Request for download actual data from BME registers
-	double pressure = (bmp280_getpressure()/100+32);
+    bmp280_measure();               // Request for download actual data from BME registers
+    double pressure = (bmp280_getpressure()/100+32);
     double temperature = bmp280_gettemperature()/100;                 //for testing we chose temperature -1degrese for accurate temperature outside 
     uint64_t altitude_b = abs(((press_ref*100*(16000+(64*temperature))+pressure*100*(16000+(64*temperature)))/(100*(press_ref - pressure))));
                                         // equation for restatement pressure to altitude with temperature compansation
