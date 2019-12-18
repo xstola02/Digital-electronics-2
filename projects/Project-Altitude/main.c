@@ -88,7 +88,7 @@ int main(void)
     // UART: asynchronous, 8-bit data, no parity, 1-bit stop
     uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
     //uart_puts("ok");
-    // Initialisation BME 280
+    // Initialisation BMP 280
     bmp280_init();
     //uart_puts("ok");
     // Timer1
