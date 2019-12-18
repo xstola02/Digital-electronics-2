@@ -11,7 +11,7 @@ Platform:    ATmega328P, 16 MHz, AVR 8-bit Toolchain 3.6.2<br>
 
 
 ## Description
-Using present pressure data from BMP280 sensor to calculate the accurated altitude 
+Using present pressure data from BMP280 sensor to calculate the accurate altitude 
       with reference pressure and current outside temperature.
       This parametr is being compared to GPS altitude data, which is read from the PA6H sensor.
       Then there is calculated the difference between BMP280 altitude data and PA6H data using absolute value. 
@@ -42,20 +42,21 @@ Using present pressure data from BMP280 sensor to calculate the accurated altitu
 ### First session
 
 (For starters we created our project file (main file, makefile).)
-- At first we implemented library Nokia5110.h, we displayed static data.
+- At first we implemented library Nokia5110.h, we displayed static data. <br>
+
 We wrote: 
 - function for BMP280 inicialisation with parameters which are reccomended for high resolution&precision
 - function for read data registers from BMP280 sensor (0xFA - 0xFC, 0xF7 - 0xF9)
-- composed registers based on LSB, MSB XLSB (pressure and temperature registers)
+- composed registers based on LSB, MSB, XLSB (pressure and temperature registers)
 
 ### Second session
 
-- we tried calculating pressure&temperature values as manufacturer reccomendet id their datasheet, it was a special equation that can't be made up, and we thought we could re-write it to our own function; later we found out that we needed to use calibration data (16-bit value) from calibration registers (8-bit)
+- we tried calculating pressure&temperature values as manufacturer reccomended in their datasheet, it was a special equation that can't be made up, and we thought we could re-write it to our own function; later we found out that we needed to use calibration data (16-bit value) from calibration registers (8-bit)
 - this cost us a lot of time (at least two sessions), we were trying to figure this out, but we didn't, so we ended up not updating data on GitHub
 
 ### Next session
 
-- implemented library for BMP280 sensor from [Jan Kasprzak](https://github.com/Yenya/avr-bmp280) and wew able to read pressure data though 
+- implemented library for BMP280 sensor from [Jan Kasprzak](https://github.com/Yenya/avr-bmp280) to be able to read pressure data though 
 ``` 
 bmp280_measure(); 
 ```
@@ -71,7 +72,7 @@ and to get the real accurate pressure value, the data had to be corigated by ari
 - we worked up the topic of pressure reference and used an equation, which includes temperature compensation, because the pressure and temperature are dependent on each other
 - we tried to work out the GPS module, but we failed
 - firstly we wanted to receive the data based on interrupt vector from the UART unit(USART_RX_vect)
-- We ended up using recomendation from datasheet and with a little help from the teacher we wrote an algorithm which tests flag bit RXC0A set in the UCSR0A register
+- We ended up using recomendation from datasheet and with a little help from the mentor we wrote an algorithm which tests flag bit RXC0A set in the UCSR0A register
 - the flag bit shows unread data from UART buffer
 - if there are data present, we check the first bit for the $ sign, if it is present the rest of the data is written in a defined field
 - then the function strstr() goes though this field and searches for for string "GPGGA" which contains desired data
