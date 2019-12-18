@@ -95,6 +95,4 @@ and to get the real accurate pressure value, the data had to be corigated by ari
 
 - datasheet Adafruit Industries, Nokia5110, Monochrome LCD, [[online](https://cdn-learn.adafruit.com/downloads/pdf/nokia-5110-3310-monochrome-lcd.pdf)]
 
-- Equation for calculating current pressure, Pavel Janko, Ver 1.1, [[online](http://esp8266.fanson.cz/sensors/180131_ASP_1_0.pdf)]
-
-
+- Equation for calculating current pressure, Pavel Janko, Ver 1.1, [[online](http://esp8266.fancon.cz/sensors/180131_ASP_1_0.pdf)] 
